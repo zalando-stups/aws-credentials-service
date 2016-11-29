@@ -1,3 +1,3 @@
-.ide/
-__pyache__
+.idea/
+__pycache__
 *.iml
