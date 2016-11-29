@@ -1,0 +1,45 @@
+swagger: "2.0"
+info:
+  title: AWS Credentials API
+  version: "1.0"
+produces:
+  - application/json
+security:
+  - oauth2: [uid]
+paths:
+  /aws-accounts/{account_id}/roles/{role_name}/credentials:
+   get:
+    summary: Get temporary AWS credentials for given account and role.
+    operationId: app.get_credentials
+    parameters:
+      - name: account_id
+        in: path
+        required: true
+        type: string
+      - name: role_name
+        in: path
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Return temporary AWS credentials
+        schema:
+          type: object
+          properties:
+            access_key_id:
+              type: string
+            secret_access_key:
+              type: string
+            session_token:
+              type: string
+      "401":
+        description: Unauthenticated
+      "403":
+        description: Access to given AWS account and role was forbidden.
+securityDefinitions:
+  oauth2:
+    type: oauth2
+    flow: implicit
+    authorizationUrl: https://example.org/notused
+    scopes:
+      uid: Unique identifier of the user accessing the service
