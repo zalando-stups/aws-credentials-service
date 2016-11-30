@@ -16,10 +16,12 @@ paths:
         in: path
         required: true
         type: string
+        pattern: "^[0-9]{12}$"
       - name: role_name
         in: path
         required: true
         type: string
+        pattern: "^[a-zA-Z0-9-]+$"
     responses:
       "200":
         description: Return temporary AWS credentials
