@@ -6,13 +6,14 @@ gevent.monkey.patch_all()
 
 import boto3
 import logging
+import os
 import re
 
 import connexion
 import requests
 
-GROUPS_URL = 'https://users.auth.zalando.com/employees/{uid}/groups'
-GROUP_PATTERN = 'cn={role_name},ou=Roles,ou=aws-[a-z]*-{account_id},ou=AWS,ou=apps,dc=zalando,dc=net'
+GROUPS_URL = os.getenv('GROUPS_URL')
+GROUP_PATTERN = os.getenv('GROUP_PATTERN')
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('connexion.api.security').setLevel(logging.WARNING)
