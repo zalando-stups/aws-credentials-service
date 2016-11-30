@@ -14,6 +14,7 @@ import requests
 
 GROUPS_URL = os.getenv('GROUPS_URL')
 GROUP_PATTERN = os.getenv('GROUP_PATTERN')
+ROLE_ARN = os.getenv('ROLE_ARN', 'arn:aws:iam::{account_id}:role/{role_name}')
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('connexion.api.security').setLevel(logging.WARNING)
@@ -42,7 +43,7 @@ def get_credentials(account_id: str, role_name: str):
     if not allowed:
         return connexion.problem(403, 'Forbidden', 'Access to requested AWS account/role was denied')
     sts = boto3.client('sts')
-    arn = "arn:aws:iam::{account_id}:role/Shibboleth-{role_name}".format(account_id=account_id, role_name=role_name)
+    arn = ROLE_ARN.format(account_id=account_id, role_name=role_name)
     try:
         role = sts.assume_role(RoleArn=arn, RoleSessionName='aws-credentials-service')
     except Exception as e:
