@@ -2,6 +2,12 @@
 AWS Credentials Service
 =======================
 
+**DISCLAIMER: This project is pre-alpha quality**
+
+This very simple service takes an OAuth Bearer token,
+checks the user's groups,
+and returns temporary AWS credentials for the given account and role.
+
 .. code-block:: bash
 
     $ docker build -t aws-credentials-service .
