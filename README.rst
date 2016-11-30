@@ -18,3 +18,21 @@ and returns temporary AWS credentials for the given account and role.
       aws-credentials-service
 
 Swagger UI is now available on http://localhost:8080/ui/
+
+Configuration
+=============
+
+The following environment variables are supported:
+
+``TOKENINFO_URL``
+    URL of OAuth tokeninfo endpoint, see `tokeninfo mock`_ and `Plan B Token Info documentation`_
+``GROUPS_URL``
+    URL to get list of user's groups
+``GROUP_PATTERN``
+    Regex pattern template to match group DN to given account ID and role name
+``ROLE_ARN``
+    Optional: template for AWS role ARN to assume (defaults to ``arn:aws:iam::{account_id}:role/{role_name}``)
+
+
+.. _tokeninfo mock: https://github.com/zalando/connexion/tree/master/examples/oauth2
+.. _Plan B Token Info documentation: http://planb.readthedocs.io/en/latest/oauth2.html#introspection-endpoint
