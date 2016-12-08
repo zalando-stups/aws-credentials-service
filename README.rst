@@ -26,6 +26,8 @@ The following environment variables are supported:
 
 ``TOKENINFO_URL``
     URL of OAuth tokeninfo endpoint, see `tokeninfo mock`_ and `Plan B Token Info documentation`_
+``OAUTH2_ACCESS_TOKEN_URL``
+    URL of OAuth Token Endpoint
 ``GROUPS_URL``
     URL to get list of user's groups
 ``GROUP_PATTERN``

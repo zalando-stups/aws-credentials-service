@@ -11,6 +11,7 @@ import re
 
 import connexion
 import requests
+import tokens
 
 GROUPS_URL = os.getenv('GROUPS_URL')
 GROUP_PATTERN = os.getenv('GROUP_PATTERN')
@@ -21,13 +22,17 @@ logging.getLogger('connexion.api.security').setLevel(logging.WARNING)
 logging.getLogger('botocore.vendored').setLevel(logging.WARNING)
 logger = logging.getLogger('aws-credentials-service')
 
+tokens.configure()
+tokens.manage('uid', ['uid'])
+tokens.start()
+
 
 def get_credentials(account_id: str, role_name: str):
     uid = connexion.request.user
     realm = connexion.request.token_info['realm']
     if realm != '/employees':
         return connexion.problem(403, 'Forbidden', 'You are not authorized to use this service')
-    token = connexion.request.token_info['access_token']
+    token = tokens.get('uid')
     try:
         response = requests.get(GROUPS_URL.format(uid=uid), headers={'Authorization': 'Bearer {}'.format(token)})
         response.raise_for_status()
