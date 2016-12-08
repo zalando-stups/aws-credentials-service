@@ -5,7 +5,7 @@ info:
 produces:
   - application/json
 security:
-  - oauth2: [uid]
+  - oauth2: []
 paths:
   /aws-accounts/{account_id}/roles/{role_name}/credentials:
    get:
