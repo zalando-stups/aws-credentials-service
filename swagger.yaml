@@ -7,6 +7,25 @@ produces:
 security:
   - oauth2: [uid]
 paths:
+  /my-aws-account-roles:
+   get:
+    summary: Get my AWS accounts and roles
+    operationId: app.get_account_roles
+    responses:
+      "200":
+        description: List of account roles
+        schema:
+          type: object
+          properties:
+            account_roles:
+              type: object
+              properties:
+                account_id:
+                  type: string
+                account_name:
+                  type: string
+                role_name:
+                  type: string
   /aws-accounts/{account_id}/roles/{role_name}/credentials:
    get:
     summary: Get temporary AWS credentials for given account and role.

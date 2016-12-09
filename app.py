@@ -27,6 +27,10 @@ tokens.manage('uid', ['uid'])
 tokens.start()
 
 
+def get_account_roles():
+    pass
+
+
 def get_credentials(account_id: str, role_name: str):
     uid = connexion.request.user
     realm = connexion.request.token_info['realm']
