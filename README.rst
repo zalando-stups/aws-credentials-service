@@ -13,8 +13,7 @@ and returns temporary AWS credentials for the given account and role.
     $ docker build -t aws-credentials-service .
     $ docker run -it -p 8080:8080 \
       -e TOKENINFO_URL=https://tokeninfo.example.org/oauth2/tokeninfo \
-      -e GROUPS_URL='https://users.example.org/employees/{uid}/groups' \
-      -e GROUP_PATTERN='cn={role_name},ou=Roles,ou=aws-[a-z]*-{account_id},ou=AWS,ou=apps,dc=example,dc=org' \
+      -e GROUPS_URL='https://groups.example.org/employees/{uid}/groups' \
       aws-credentials-service
 
 Swagger UI is now available on http://localhost:8080/ui/
@@ -30,10 +29,17 @@ The following environment variables are supported:
     URL of OAuth Token Endpoint
 ``GROUPS_URL``
     URL to get list of user's groups
-``GROUP_PATTERN``
-    Regex pattern template to match group DN to given account ID and role name
 ``ROLE_ARN``
     Optional: template for AWS role ARN to assume (defaults to ``arn:aws:iam::{account_id}:role/{role_name}``)
+
+The ``GROUPS_URL`` needs to return a JSON structure like:
+
+.. code-block:: json
+
+    [
+    {"role": "PowerUser", "id": "123456789012", "name": "myacc"},
+    {"role": "ReadOnly", "id": "456456789012", "name": "foobar"}
+    ]
 
 
 .. _tokeninfo mock: https://github.com/zalando/connexion/tree/master/examples/oauth2
