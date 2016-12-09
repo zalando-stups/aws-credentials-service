@@ -7,10 +7,16 @@ produces:
 security:
   - oauth2: [uid]
 paths:
-  /my-aws-account-roles:
+  /aws-account-roles/{user_id}:
    get:
     summary: Get my AWS accounts and roles
     operationId: app.get_account_roles
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+        pattern: "^[a-zA-Z0-9-]+$"
     responses:
       "200":
         description: List of account roles

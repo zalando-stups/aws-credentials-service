@@ -7,14 +7,12 @@ gevent.monkey.patch_all()
 import boto3
 import logging
 import os
-import re
 
 import connexion
 import requests
 import tokens
 
 GROUPS_URL = os.getenv('GROUPS_URL')
-GROUP_PATTERN = os.getenv('GROUP_PATTERN')
 ROLE_ARN = os.getenv('ROLE_ARN', 'arn:aws:iam::{account_id}:role/{role_name}')
 
 logging.basicConfig(level=logging.INFO)
@@ -27,8 +25,22 @@ tokens.manage('uid', ['uid'])
 tokens.start()
 
 
-def get_account_roles():
-    pass
+def get_groups(uid):
+    token = tokens.get('uid')
+    response = requests.get(GROUPS_URL.format(uid=uid), headers={'Authorization': 'Bearer {}'.format(token)})
+    response.raise_for_status()
+    groups = response.json()
+    return groups
+
+
+def map_group_to_account_role(group):
+    return {'account_id': group['id'], 'role': group['role'], 'name': group['name']}
+
+
+def get_account_roles(user_id):
+    groups = get_groups(user_id)
+    account_roles = list(map(map_group_to_account_role, groups))
+    return {'account_roles': account_roles}
 
 
 def get_credentials(account_id: str, role_name: str):
@@ -36,17 +48,14 @@ def get_credentials(account_id: str, role_name: str):
     realm = connexion.request.token_info['realm']
     if realm != '/employees':
         return connexion.problem(403, 'Forbidden', 'You are not authorized to use this service')
-    token = tokens.get('uid')
     try:
-        response = requests.get(GROUPS_URL.format(uid=uid), headers={'Authorization': 'Bearer {}'.format(token)})
-        response.raise_for_status()
-        groups = response.json()
+        groups = get_groups(uid)
     except Exception as e:
         logger.exception('Failed to get groups for {}'.format(uid))
         return connexion.problem(500, 'Server Error', 'Failed to get groups: {}'.format(e))
     allowed = False
-    for group in groups:
-        if re.match(GROUP_PATTERN.format(role_name=role_name, account_id=account_id), group['dn']):
+    for account_role in map(map_group_to_account_role, groups):
+        if role_name == account_role['role_name'] and account_id == account_role['account_id']:
             allowed = True
             break
     if not allowed:
