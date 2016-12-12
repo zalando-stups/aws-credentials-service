@@ -34,7 +34,7 @@ def get_groups(uid):
 
 
 def map_group_to_account_role(group):
-    return {'account_id': group['id'], 'role': group['role'], 'name': group['name']}
+    return {'account_id': group['id'], 'role_name': group['role'], 'account_name': group['name']}
 
 
 def get_account_roles(user_id):
