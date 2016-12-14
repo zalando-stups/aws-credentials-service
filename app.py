@@ -29,7 +29,7 @@ def get_groups(uid):
     token = tokens.get('uid')
     response = requests.get(GROUPS_URL.format(uid=uid), headers={'Authorization': 'Bearer {}'.format(token)})
     response.raise_for_status()
-    groups = response.json()
+    groups = [g for g in response.json() if not g.get('disabled')]
     return groups
 
 
