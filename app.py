@@ -63,7 +63,7 @@ def get_credentials(account_id: str, role_name: str):
     sts = boto3.client('sts')
     arn = ROLE_ARN.format(account_id=account_id, role_name=role_name)
     try:
-        role = sts.assume_role(RoleArn=arn, RoleSessionName='aws-credentials-service')
+        role = sts.assume_role(RoleArn=arn, RoleSessionName='{}/{}'.format(role_name, uid))
     except Exception as e:
         logger.exception('Failed to assume role {}'.format(arn))
         return connexion.problem(500, 'AWS Error', 'Failed to assume role: {}'.format(e))
