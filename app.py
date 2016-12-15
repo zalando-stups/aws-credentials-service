@@ -9,11 +9,13 @@ import logging
 import os
 
 import connexion
+import re
 import requests
 import tokens
 
 GROUPS_URL = os.getenv('GROUPS_URL')
 ROLE_ARN = os.getenv('ROLE_ARN', 'arn:aws:iam::{account_id}:role/{role_name}')
+ROLE_SESSION_NAME_INVALID_CHARS = re.compile('[^\w+=,.@-]')
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('connexion.api.security').setLevel(logging.WARNING)
@@ -62,8 +64,9 @@ def get_credentials(account_id: str, role_name: str):
         return connexion.problem(403, 'Forbidden', 'Access to requested AWS account/role was denied')
     sts = boto3.client('sts')
     arn = ROLE_ARN.format(account_id=account_id, role_name=role_name)
+    role_session_name = ROLE_SESSION_NAME_INVALID_CHARS.sub('', uid)
     try:
-        role = sts.assume_role(RoleArn=arn, RoleSessionName='{}/{}'.format(role_name, uid))
+        role = sts.assume_role(RoleArn=arn, RoleSessionName=role_session_name)
     except Exception as e:
         logger.exception('Failed to assume role {}'.format(arn))
         return connexion.problem(500, 'AWS Error', 'Failed to assume role: {}'.format(e))
