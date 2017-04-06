@@ -1,5 +1,5 @@
 boto3
-connexion>=1.1.7
+connexion>=1.1.8
 gevent
 requests
 stups-tokens
