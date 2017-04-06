@@ -45,9 +45,9 @@ def get_account_roles(user_id):
     return {'account_roles': account_roles}
 
 
-def get_credentials(account_id: str, role_name: str):
-    uid = connexion.request.user
-    realm = connexion.request.token_info['realm']
+def get_credentials(account_id: str, role_name: str, user: str, token_info: dict):
+    uid = user
+    realm = token_info['realm']
     if realm != '/employees':
         return connexion.problem(403, 'Forbidden', 'You are not authorized to use this service')
     try:
