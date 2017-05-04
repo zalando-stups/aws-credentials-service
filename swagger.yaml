@@ -60,7 +60,8 @@ paths:
             session_token:
               type: string
             expiration:
-              type: date-time
+              type: string
+              format: date-time
       "401":
         description: Unauthenticated
       "403":
