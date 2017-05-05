@@ -75,7 +75,8 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
 
     return {'access_key_id': credentials["AccessKeyId"],
             'secret_access_key': credentials["SecretAccessKey"],
-            'session_token': credentials["SessionToken"]}
+            'session_token': credentials["SessionToken"],
+            'expiration': credentials["Expiration"]}
 
 
 app = connexion.App(__name__)
