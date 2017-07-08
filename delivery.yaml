@@ -1,10 +1,15 @@
 build_steps:
-    - desc: 'Install required build software'
-      cmd: 'apt-get install -y apt-transport-https ca-certificates curl'
     - desc: 'Install Docker'
-      cmd: 'curl -sSL https://get.docker.com/ | sh'
+      cmd: 'curl -fLOsS https://delivery.cloud.zalando.com/utils/ensure-docker && sh ensure-docker && rm ensure-docker'
     - desc: 'Build'
       cmd: |
-        image=registry-write.opensource.zalan.do/teapot/aws-credentials-service:${CDP_BUILD_VERSION}
+        IS_PR_BUILD=${CDP_PULL_REQUEST_NUMBER+"true"}
+        if [[ ${IS_PR_BUILD} != "true" ]]
+        then
+            image=registry-write.opensource.zalan.do/teapot/aws-credentials-service:${CDP_BUILD_VERSION}
+        else
+            # PR build, use -test suffix
+            image=registry-write.opensource.zalan.do/teapot/aws-credentials-service-test:${CDP_BUILD_VERSION}
+        fi
         docker build -t $image .
         docker push $image
