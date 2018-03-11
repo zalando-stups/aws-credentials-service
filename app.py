@@ -113,7 +113,7 @@ app.add_api('swagger.yaml')
 
 
 if __name__ == '__main__':
-    tracer = os.environ.get('OPENTRACING_TRACER')
+    tracer = os.getenv('OPENTRACING_TRACER')
     logger.info('Starting server with OpenTracing tracer: {}'.format(tracer))
 
     init_opentracing_tracer(tracer)
