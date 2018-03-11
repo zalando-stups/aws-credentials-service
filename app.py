@@ -94,6 +94,7 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
             return connexion.problem(403, 'AWS Error', error_message)
         else:
             # something else happened
+            current_span.set_tag('error', True)
             logger.exception('Failed to assume role {}'.format(arn))
             return connexion.problem(500, 'AWS Error', error_message)
 
