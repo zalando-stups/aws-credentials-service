@@ -68,8 +68,15 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
     try:
         role = sts.assume_role(RoleArn=arn, RoleSessionName=role_session_name)
     except Exception as e:
-        logger.exception('Failed to assume role {}'.format(arn))
-        return connexion.problem(500, 'AWS Error', 'Failed to assume role: {}'.format(e))
+        error_message = 'Failed to assume role: {}'.format(e)
+        if 'AccessDenied' in error_message:
+            # role might not exist in target account
+            logger.error(error_message)
+            return connexion.problem(403, 'AWS Error', error_message)
+        else:
+            # something else happened
+            logger.exception('Failed to assume role {}'.format(arn))
+            return connexion.problem(500, 'AWS Error', error_message)
     credentials = role['Credentials']
     logger.info('Handing out credentials for {account_id}/{role_name} to {uid}'.format(account_id=account_id, role_name=role_name, uid=uid))
 
