@@ -3,7 +3,8 @@ info:
   title: AWS Credentials API
   version: "1.0"
   description: Provide temporary AWS access credentials for a given OAuth identity
-  x-audience: company-internal  
+  x-audience: company-internal
+  x-api-id: cc1e478c-710b-4ff0-911b-88f7d53b566f
 produces:
   - application/json
 security:
