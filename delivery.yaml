@@ -1,15 +1,17 @@
-build_steps:
-    - desc: 'Install Docker'
-      cmd: 'curl -fLOsS https://delivery.cloud.zalando.com/utils/ensure-docker && sh ensure-docker && rm ensure-docker'
-    - desc: 'Build'
-      cmd: |
-        IS_PR_BUILD=${CDP_PULL_REQUEST_NUMBER+"true"}
-        if [[ ${IS_PR_BUILD} != "true" ]]
-        then
-            image=registry-write.opensource.zalan.do/teapot/aws-credentials-service:${CDP_BUILD_VERSION}
-        else
-            # PR build, use -test suffix
-            image=registry-write.opensource.zalan.do/teapot/aws-credentials-service-test:${CDP_BUILD_VERSION}
-        fi
-        docker build -t $image .
-        docker push $image
+version: "2017-09-20"
+pipeline:
+- id: build
+  type: script
+  commands:
+  - desc: Build and push docker image
+    cmd: |
+      IS_PR_BUILD=${CDP_PULL_REQUEST_NUMBER+"true"}
+      if [[ ${IS_PR_BUILD} != "true" ]]
+      then
+          image=registry-write.opensource.zalan.do/teapot/aws-credentials-service:${CDP_BUILD_VERSION}
+      else
+          # PR build, use -test suffix
+          image=registry-write.opensource.zalan.do/teapot/aws-credentials-service-test:${CDP_BUILD_VERSION}
+      fi
+      docker build -t $image .
+      docker push $image
