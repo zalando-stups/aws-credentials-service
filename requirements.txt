@@ -1,7 +1,12 @@
 boto3
 connexion>=1.1.13
 gevent
+<<<<<<< HEAD
 opentracing-utils
+=======
+>>>>>>> 8fd512923b7c3ed1e0300b0e6c3b5a20065a4b8d
 opentracing>=1.3,<2.0
 requests
 stups-tokens
+
+-e git+https://github.com/zalando-zmon/opentracing-utils.git#egg=opentracing_util
