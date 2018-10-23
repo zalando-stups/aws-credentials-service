@@ -29,8 +29,8 @@ logging.getLogger('connexion.api.security').setLevel(logging.WARNING)
 logging.getLogger('botocore.vendored').setLevel(logging.WARNING)
 logger = logging.getLogger('aws-credentials-service')
 
-tokens.configure()
-tokens.manage('uid', ['uid'])
+tokens.configure(from_file_only=True)
+tokens.manage('uid')
 tokens.start()
 
 
