@@ -15,6 +15,7 @@ import connexion
 import re
 import requests
 import tokens
+import audittrail
 
 from opentracing_utils import init_opentracing_tracer, trace
 from opentracing_utils import trace_flask, extract_span_from_flask_request
