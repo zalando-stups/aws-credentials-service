@@ -7,6 +7,7 @@ gevent.monkey.patch_all()  # noqa
 from opentracing_utils import trace_requests
 trace_requests()  # noqa
 
+import audittrail
 import boto3
 import logging
 import os
@@ -34,6 +35,7 @@ tokens.configure(from_file_only=True)
 tokens.manage('uid')
 tokens.start()
 
+audittrail_client = audittrail.AuditTrail(os.getenv('AUDITTRAIL_URL'), 'uid', tokens)
 
 @trace()
 def get_groups(uid):
@@ -103,6 +105,7 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
     logger.info(
         'Handing out credentials for {account_id}/{role_name} to {uid}'.format(
             account_id=account_id, role_name=role_name, uid=uid))
+    audittrail_client.request_aws_credentials(user, realm, account_id, role_name)
 
     return {'access_key_id': credentials['AccessKeyId'],
             'secret_access_key': credentials['SecretAccessKey'],
