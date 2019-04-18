@@ -7,7 +7,6 @@ gevent.monkey.patch_all()  # noqa
 from opentracing_utils import trace_requests
 trace_requests()  # noqa
 
-import audittrail
 import boto3
 import logging
 import os
