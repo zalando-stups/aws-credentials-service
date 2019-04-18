@@ -43,7 +43,7 @@ class AuditTrail:
     def request_aws_credentials(self, user, realm, account_id, role):
         event = {
             "event_type": self.event_type,
-            "triggered_at": datetime.datetime.utcnow().isoformat(),
+            "triggered_at": datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat(),
             "triggered_by": {
                 "type": "USER",
                 "id": user,
