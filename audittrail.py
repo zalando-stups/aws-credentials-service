@@ -58,4 +58,4 @@ class AuditTrail:
             }
         }
 
-        self.__send(self, event)
+        self.__send(event)
