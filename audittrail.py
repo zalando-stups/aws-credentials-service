@@ -18,7 +18,7 @@ class AuditTrail:
 
     def __init__(self, url, token_name, token_source):
         self.session = requests.Session()
-        self.url = url + "/events/{}"
+        self.url = "{}/events/".format(url) + "{}"
         self.token_name = token_name
         self.token_source = token_source
 
@@ -35,7 +35,7 @@ class AuditTrail:
         }
 
         try:
-            r = self.session.put(self.url.format(event_id), data=payload, headers=headers)
+            r = self.session.put(self.url.format(event_id), data=payload, headers=headers, timeout=5.0)
             r.raise_for_status()
         except Exception as e:
             logger.exception("Failed to push event ({})".format(e))
