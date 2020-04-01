@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 import gevent.monkey
+
 gevent.monkey.patch_all()  # noqa
 
 # Trace all outgoing requests
 from opentracing_utils import trace_requests
+
 trace_requests()  # noqa
 
 import boto3
@@ -20,10 +22,10 @@ import audittrail
 from opentracing_utils import init_opentracing_tracer, trace
 from opentracing_utils import trace_flask, extract_span_from_flask_request
 
-
 GROUPS_URL = os.getenv('GROUPS_URL')
 ROLE_ARN = os.getenv('ROLE_ARN', 'arn:aws:iam::{account_id}:role/{role_name}')
-ROLE_SESSION_NAME_INVALID_CHARS = re.compile('[^\w+=,.@-]')
+ROLE_SESSION_NAME_INVALID_CHARS = re.compile(r'[^\w+=,.@-]')
+GROUP_NAME = re.compile(r"^Apps/AWS/Aws-(?P<account_name>[-\w]+)-(?P<account_id>\d+)/Roles/(?P<role_name>\w+)$")
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('connexion.api.security').setLevel(logging.WARNING)
@@ -36,25 +38,40 @@ tokens.start()
 
 audittrail_client = audittrail.AuditTrail(os.getenv('AUDITTRAIL_URL'), 'uid', tokens)
 
+
+def parse_groups(groups):
+    for group in groups:
+        if "provider" in group:
+            # /accounts/aws API
+            yield {
+                "account_id": group["id"],
+                "account_name": group["name"],
+                "role_name": group["role"],
+            }
+        else:
+            # /groups API
+            match = GROUP_NAME.fullmatch(group["name"])
+            if not match:
+                continue
+
+            yield {
+                "account_id": match.group("account_id"),
+                "account_name": match.group("account_name").lower(),
+                "role_name": match.group("role_name"),
+            }
+
+
 @trace()
-def get_groups(uid):
+def get_roles(username):
     token = tokens.get('uid')
-    response = requests.get(GROUPS_URL.format(uid=uid), headers={'Authorization': 'Bearer {}'.format(token)})
+    response = requests.get(GROUPS_URL.format(uid=username), headers={'Authorization': 'Bearer {}'.format(token)})
     response.raise_for_status()
-    groups = [g for g in response.json() if not g.get('disabled')]
-    return groups
-
-
-def map_group_to_account_role(group):
-    return {'account_id': group['id'], 'role_name': group['role'], 'account_name': group['name']}
+    return list(parse_groups(response.json()))
 
 
 def get_account_roles(user_id):
     current_span = extract_span_from_flask_request()
-
-    groups = get_groups(user_id, parent_span=current_span)
-    account_roles = list(map(map_group_to_account_role, groups))
-    return {'account_roles': account_roles}
+    return {'account_roles': get_roles(user_id, parent_span=current_span)}
 
 
 def get_credentials(account_id: str, role_name: str, user: str, token_info: dict):
@@ -66,14 +83,14 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
     if realm != '/employees':
         return connexion.problem(403, 'Forbidden', 'You are not authorized to use this service')
     try:
-        groups = get_groups(uid)
+        roles = get_roles(uid)
     except Exception as e:
         current_span.log_kv({'exception': str(e)})
         logger.exception('Failed to get groups for {}'.format(uid))
         return connexion.problem(500, 'Server Error', 'Failed to get groups: {}'.format(e))
 
     allowed = False
-    for account_role in map(map_group_to_account_role, groups):
+    for account_role in roles:
         if role_name == account_role['role_name'] and account_id == account_role['account_id']:
             allowed = True
             break
@@ -114,7 +131,6 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
 
 app = connexion.App(__name__)
 app.add_api('swagger.yaml')
-
 
 if __name__ == '__main__':
     tracer = os.getenv('OPENTRACING_TRACER')
