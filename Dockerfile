@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/library/python-3.8-slim:latest
+FROM registry.opensource.zalan.do/library/python-3.9-slim:latest
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
