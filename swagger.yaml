@@ -1,12 +1,10 @@
-swagger: "2.0"
+openapi: "3.0.0"
 info:
   title: AWS Credentials API
   version: "1.0.0"
   description: Provide temporary AWS access credentials for a given OAuth identity
   x-audience: component-internal
   x-api-id: cc1e478c-710b-4ff0-911b-88f7d53b566f
-produces:
-  - application/json
 security:
   - oauth2: [uid]
 paths:
@@ -18,23 +16,26 @@ paths:
       - name: user_id
         in: path
         required: true
-        type: string
-        pattern: "^[a-zA-Z0-9-]+$"
+        schema:
+          type: string
+          pattern: "^[a-zA-Z0-9-]+$"
     responses:
       "200":
         description: List of account roles
-        schema:
-          type: object
-          properties:
-            account_roles:
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                account_id:
-                  type: string
-                account_name:
-                  type: string
-                role_name:
-                  type: string
+                account_roles:
+                  type: object
+                  properties:
+                    account_id:
+                      type: string
+                    account_name:
+                      type: string
+                    role_name:
+                      type: string
   /aws-accounts/{account_id}/roles/{role_name}/credentials:
    get:
     summary: Get temporary AWS credentials for given account and role.
@@ -43,36 +44,42 @@ paths:
       - name: account_id
         in: path
         required: true
-        type: string
-        pattern: "^[0-9]{12}$"
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
       - name: role_name
         in: path
         required: true
-        type: string
-        pattern: "^[a-zA-Z0-9-]+$"
+        schema:
+          type: string
+          pattern: "^[a-zA-Z0-9-]+$"
     responses:
       "200":
         description: Return temporary AWS credentials
-        schema:
-          type: object
-          properties:
-            access_key_id:
-              type: string
-            secret_access_key:
-              type: string
-            session_token:
-              type: string
-            expiration:
-              type: string
-              format: date-time
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_key_id:
+                  type: string
+                secret_access_key:
+                  type: string
+                session_token:
+                  type: string
+                expiration:
+                  type: string
+                  format: date-time
       "401":
         description: Unauthenticated
       "403":
         description: Access to given AWS account and role was forbidden.
-securityDefinitions:
-  oauth2:
-    type: oauth2
-    flow: implicit
-    authorizationUrl: https://example.org/notused
-    scopes:
-      uid: Unique identifier of the user accessing the service
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://example.org/notused
+          scopes:
+            uid: Unique identifier of the user accessing the service

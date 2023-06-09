@@ -147,7 +147,9 @@ def get_credentials(account_id: str, role_name: str, user: str, token_info: dict
     }
 
 
-app = connexion.App(__name__)
+# We should reconsider publishing this information
+options = {"serve_spec": True, "swagger_ui": True}
+app = connexion.App(__name__, options=options)
 app.add_api("swagger.yaml")
 
 if __name__ == "__main__":
