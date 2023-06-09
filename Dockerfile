@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/library/python-3.9-slim:latest
+FROM container-registry.zalando.net/library/python-3.9-slim:latest
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
