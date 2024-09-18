@@ -1,6 +1,6 @@
-=======================
-AWS Credentials Service
-=======================
+====================================
+AWS Credentials Service (deprecated)
+====================================
 
 .. image:: https://img.shields.io/badge/OpenTracing-enabled-blue.svg
    :target: http://opentracing.io
